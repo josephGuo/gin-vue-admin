@@ -1,0 +1,36 @@
+name: 'Upstream Sync'
+
+on:
+  schedule:
+    - cron:  '0 7 * * *'    # 每天北京时间 15:00 执行 (UTC 7:00)
+  workflow_dispatch:      # 允许手动点击按钮触发
+
+jobs:
+  sync_latest_from_upstream:
+    runs-on: ubuntu-latest
+    name: Sync latest commits from upstream repo
+
+    steps:
+    # 第一步：检出你的 Fork 仓库
+    - name: Checkout target repo
+      uses: actions/checkout@v6
+      with:
+        token: ${{ github.token }} # 使用你刚才设置的 Secret
+
+    # 第二步：运行同步 Action
+    - name: Sync upstream changes
+      id: sync
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.2
+      with:
+        upstream_sync_repo: flipped-aurora/gin-vue-admin   # 【需修改】填入原作者的 仓库路径
+        upstream_sync_branch: main                      # 【需修改】原作者的主分支名
+        target_sync_branch: main                        # 你的同步分支名
+        target_repo_token: ${{ github.token }}    # 确认 Secret 名称一致
+
+        # 策略设置
+        test_mode: false # 设为 true 可以测试而不实际推送
+      
+    # 第三步：检查同步结果（可选）
+    - name: Check for errors
+      if: failure()
+      run: echo "同步失败，可能存在冲突，请手动处理。"
