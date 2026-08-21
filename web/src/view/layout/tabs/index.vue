@@ -1,58 +1,103 @@
 <template>
   <div
-    ref="scrollRef"
-    class="gva-tabs isolate flex items-center gap-1.5 h-11 w-full overflow-x-auto bg-[var(--gva-tabs-bg)] px-3 pt-1.5 shadow-[var(--gva-tabs-shadow)]"
-    :class="containerClass"
+    class="isolate flex h-11 w-full items-stretch bg-[var(--gva-tabs-bg)] shadow-[var(--gva-tabs-shadow)]"
   >
-    <ContextMenuRoot
-      v-for="item in historys"
-      :key="getFmtString(item)"
-      :modal="false"
-      @update:open="(open) => onContextMenuOpen(open, item)"
+    <g-button
+      v-show="hasOverflow"
+      variant="ghost"
+      size="icon"
+      class="h-full w-8 shrink-0 rounded-none border-r border-border text-muted-foreground hover:text-base-text"
+      :disabled="!canScrollLeft"
+      aria-label="向左滚动标签"
+      title="向左滚动标签"
+      @click="scrollTabs(-1)"
     >
-      <ContextMenuTrigger as-child :disabled="contextMenuDisabled">
-        <g-page-tab
-          :mode="tabMode"
-          :active="isActive(item)"
-          :closable="isClosable(item)"
-          @click="switchTo(item)"
-          @mousedown="middleCloseTab($event, item)"
-          @close="removeTab(getFmtString(item))"
-        >
-          <template v-if="showTabIcon && item.meta.icon" #prefix>
-            <component :is="item.meta.icon" class="h-4 w-4 shrink-0" />
-          </template>
-          {{ fmtTitle(item.meta.title, item) }}
-        </g-page-tab>
-      </ContextMenuTrigger>
+      <svg-icon icon="lucide:chevron-left" class="h-4 w-4" />
+    </g-button>
 
-      <ContextMenuPortal>
-        <ContextMenuContent
-          :side-offset="4"
-          class="z-[3000] min-w-[120px] overflow-hidden rounded-md border border-border bg-container py-1 text-[13px] text-base-text shadow-card"
-        >
-          <ContextMenuItem
-            v-for="action in contextMenuActions"
-            :key="action.key"
-            class="cursor-pointer select-none px-4 py-1.5 outline-none transition-colors data-[highlighted]:bg-muted"
-            @select="action.handler"
+    <div
+      ref="scrollRef"
+      class="gva-tabs flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto px-3 pt-1.5"
+      :class="containerClass"
+      @scroll="updateScrollState"
+      @wheel="handleWheel"
+    >
+      <ContextMenuRoot
+        v-for="item in historys"
+        :key="getFmtString(item)"
+        :modal="false"
+        @update:open="(open) => onContextMenuOpen(open, item)"
+      >
+        <ContextMenuTrigger as-child :disabled="contextMenuDisabled">
+          <g-page-tab
+            :mode="tabMode"
+            :active="isActive(item)"
+            :closable="isClosable(item)"
+            class="gva-tab-sortable shrink-0 !cursor-grab active:!cursor-grabbing"
+            @click="switchTo(item)"
+            @mousedown="middleCloseTab($event, item)"
+            @close="removeTab(getFmtString(item))"
           >
-            {{ action.label }}
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenuPortal>
-    </ContextMenuRoot>
+            <template v-if="showTabIcon && item.meta.icon" #prefix>
+              <component :is="item.meta.icon" class="h-4 w-4 shrink-0" />
+            </template>
+            {{ fmtTitle(item.meta.title, item) }}
+          </g-page-tab>
+        </ContextMenuTrigger>
+
+        <ContextMenuPortal>
+          <ContextMenuContent
+            :side-offset="4"
+            class="z-[3000] min-w-[120px] overflow-hidden rounded-md border border-border bg-container py-1 text-[13px] text-base-text shadow-card"
+          >
+            <ContextMenuItem
+              v-for="action in contextMenuActions"
+              :key="action.key"
+              class="cursor-pointer select-none px-4 py-1.5 outline-none transition-colors data-[highlighted]:bg-muted"
+              @select="action.handler"
+            >
+              {{ action.label }}
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenuPortal>
+      </ContextMenuRoot>
+    </div>
+
+    <g-button
+      v-show="hasOverflow"
+      variant="ghost"
+      size="icon"
+      class="h-full w-8 shrink-0 rounded-none border-l border-border text-muted-foreground hover:text-base-text"
+      :disabled="!canScrollRight"
+      aria-label="向右滚动标签"
+      title="向右滚动标签"
+      @click="scrollTabs(1)"
+    >
+      <svg-icon icon="lucide:chevron-right" class="h-4 w-4" />
+    </g-button>
   </div>
 </template>
 
 <script setup>
   import { emitter } from '@/utils/bus.js'
-  import { computed, onUnmounted, ref, watch, nextTick } from 'vue'
+  import {
+    computed,
+    nextTick,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch
+  } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useUserStore } from '@/pinia/modules/user'
   import { useThemeStore } from '@/pinia'
   import { storeToRefs } from 'pinia'
   import { fmtTitle } from '@/utils/fmtRouterTitle'
+  import Sortable from 'sortablejs'
+  import {
+    getHorizontalScrollState,
+    reorderTabs
+  } from './tabs-interaction.js'
   import {
     ContextMenuRoot,
     ContextMenuTrigger,
@@ -109,6 +154,47 @@
   const isActive = (item) => getFmtString(item) === activeValue.value
 
   const scrollRef = ref(null)
+  const hasOverflow = ref(false)
+  const canScrollLeft = ref(false)
+  const canScrollRight = ref(false)
+  let resizeObserver
+  let sortable
+
+  const updateScrollState = () => {
+    if (!scrollRef.value) {
+      hasOverflow.value = false
+      canScrollLeft.value = false
+      canScrollRight.value = false
+      return
+    }
+
+    const state = getHorizontalScrollState(scrollRef.value)
+    hasOverflow.value = state.hasOverflow
+    canScrollLeft.value = state.canScrollLeft
+    canScrollRight.value = state.canScrollRight
+  }
+
+  const scrollTabs = (direction) => {
+    if (!scrollRef.value) return
+
+    scrollRef.value.scrollBy({
+      left: direction * Math.max(scrollRef.value.clientWidth * 0.6, 160),
+      behavior: 'smooth'
+    })
+  }
+
+  const handleWheel = (event) => {
+    if (!hasOverflow.value) return
+    if (Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return
+    if (event.deltaY === 0) return
+
+    event.preventDefault()
+    scrollRef.value?.scrollBy({
+      left: event.deltaY,
+      behavior: 'auto'
+    })
+  }
+
   // 路由变化后把激活标签滚入可视区（el-tabs 原本免费提供，这里显式补回）
   const scrollActiveIntoView = async () => {
     await nextTick()
@@ -290,6 +376,7 @@
     () => {
       sessionStorage.setItem('historys', JSON.stringify(historys.value))
       emitter.emit('setKeepAlive', historys.value)
+      nextTick(updateScrollState)
     },
     {
       deep: true
@@ -298,6 +385,7 @@
 
   // 激活标签变化时滚动到可视区
   watch(activeValue, scrollActiveIntoView)
+  watch(tabMode, () => nextTick(updateScrollState))
 
   const initPage = () => {
     // 全局监听 关闭当前页面函数
@@ -373,7 +461,31 @@
   }
   initPage()
 
+  onMounted(() => {
+    sortable = Sortable.create(scrollRef.value, {
+      animation: 180,
+      draggable: '.gva-tab-sortable',
+      handle: '.gva-tab-sortable',
+      filter: '.gva-tab-close-btn',
+      preventOnFilter: false,
+      ghostClass: 'gva-tab-ghost',
+      chosenClass: 'gva-tab-chosen',
+      dragClass: 'gva-tab-dragging',
+      onEnd: ({ oldIndex, newIndex }) => {
+        historys.value = reorderTabs(historys.value, oldIndex, newIndex)
+      }
+    })
+
+    resizeObserver = new ResizeObserver(updateScrollState)
+    resizeObserver.observe(scrollRef.value)
+    window.addEventListener('resize', updateScrollState)
+    nextTick(updateScrollState)
+  })
+
   onUnmounted(() => {
+    sortable?.destroy()
+    resizeObserver?.disconnect()
+    window.removeEventListener('resize', updateScrollState)
     emitter.off('collapse')
     emitter.off('mobile')
   })
@@ -383,5 +495,18 @@
   /* 横向滚动条不占位（保留可滚动，仅隐藏滚动条本体） */
   .gva-tabs::-webkit-scrollbar {
     height: 0;
+  }
+
+  .gva-tabs {
+    scrollbar-width: none;
+  }
+
+  :deep(.gva-tab-ghost) {
+    opacity: 0.35;
+  }
+
+  :deep(.gva-tab-chosen),
+  :deep(.gva-tab-dragging) {
+    cursor: grabbing !important;
   }
 </style>

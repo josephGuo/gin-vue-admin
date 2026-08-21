@@ -42,6 +42,7 @@
 
   const config = {
     fieldReadonly: false,
+    showAi: false,
     useTemplate: true
   }
 
