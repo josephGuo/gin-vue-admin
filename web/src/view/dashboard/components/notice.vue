@@ -49,7 +49,7 @@
     {
       typeTitle: '合规',
       time: '3天前',
-      title: '未授权商用存在合规风险，建议团队尽快完成授权以保障项目持续交付。',
+      title: '使用开源版时请遵守 Apache License 2.0，并按许可证要求保留适用声明。',
       dotClass: 'bg-amber-500',
       tagClass: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'
     },

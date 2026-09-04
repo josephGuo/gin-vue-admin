@@ -63,15 +63,14 @@
 - **演示站测试用户名**: `admin`
 - **演示站测试密码**: `123456`
 
-想了解授权版提供的完整体验，可先访问[授权版演示站](https://vip.gin-vue-admin.com)；用于商用或生产环境时，请[购买商业授权](https://plugin.gin-vue-admin.com/license)。
+想了解授权版提供的完整体验，可先访问[授权版演示站](https://vip.gin-vue-admin.com)；如需授权版功能或官方商业支持，请[购买商业授权](https://plugin.gin-vue-admin.com/license)。
 
 ## 重要提示
 
 1. 本项目从起步到开发到部署均有文档和详细视频教程。
 2. 本项目需要您有一定的 golang 和 vue 基础。
 3. 您完全可以通过我们的教程和文档完成一切操作，因此我们不再提供免费的技术服务，如需服务请进行[付费支持](https://www.gin-vue-admin.com/coffee/payment.html)。
-4. 本项目采用 BSL 1.1 授权。非商用、学习、评估等用途请遵循仓库许可证；如将此项目用于商用或生产环境，或需要移除版权与署名信息，请[购买授权](https://plugin.gin-vue-admin.com/license)。您需保留仓库、日志和代码中的版权声明信息。
-
+4. 本项目采用 Apache License 2.0 开源许可。使用、修改和分发本项目时，请遵循仓库中的 `LICENSE`，并保留许可证要求的适用声明；如需授权版功能或官方商业支持，请[购买授权](https://plugin.gin-vue-admin.com/license)。
 <br>
 
 <div align="center">
@@ -259,5 +258,5 @@ fmt.Println(decodeBytes, err)
 
 ## 10. 注意事项
 
-请遵守 BSL 1.1 许可证要求并保留作品声明；商用、生产使用或去除版权信息请务必[获取授权](https://plugin.gin-vue-admin.com/license)  
-未授权超出许可范围使用将依法追究法律责任。
+请遵守 Apache License 2.0，并按许可证要求保留适用的版权、专利、商标和归属声明。
+授权版功能与官方商业支持请通过[商业授权页面](https://plugin.gin-vue-admin.com/license)获取。

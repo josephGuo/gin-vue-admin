@@ -30,7 +30,7 @@ English | [简体中文](./README.md)
 - **Demo Username**: `admin`
 - **Demo Password**: `123456`
 
-Explore the [licensed edition demo](https://vip.gin-vue-admin.com) to see the complete experience. For commercial or production use, [purchase a commercial license](https://plugin.gin-vue-admin.com/license).
+Explore the [licensed edition demo](https://vip.gin-vue-admin.com) to see the complete experience. For licensed-edition features or official commercial support, [purchase a commercial license](https://plugin.gin-vue-admin.com/license).
 
 ## 1. Basic Introduction
 
@@ -316,5 +316,5 @@ If you find this project useful, you can buy author a glass of juice :tropical_d
 
 ## 10. Commercial considerations
 
-If you use this project for commercial purposes, please comply with the Apache2.0 agreement and retain the author's technical support statement.
+This project is licensed under the Apache License 2.0. When using, modifying, or distributing it, follow the `LICENSE` file and retain all applicable notices required by the license.
 
