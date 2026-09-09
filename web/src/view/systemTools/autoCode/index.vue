@@ -1586,6 +1586,8 @@
       autoCreateResource: false,
       onlyTemplate: false,
       isTree: false,
+      generateWeb: true,
+      generateServer: true,
       treeJson: "",
       fields: []
     }
