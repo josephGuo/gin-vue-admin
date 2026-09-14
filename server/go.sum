@@ -458,8 +458,8 @@ github.com/shopspring/decimal v1.4.0 h1:bxl37RwXBklmTi0C79JfXCEBD1cqqHt0bbgBAGFp
 github.com/shopspring/decimal v1.4.0/go.mod h1:gawqmDU56v4yIKSwfBSFip1HdCCXN8/+DMd9qYNcwME=
 github.com/sijms/go-ora/v2 v2.7.17 h1:M/pYIqjaMUeBxyzOWp2oj4ntF6fHSBloJWGNH9vbmsU=
 github.com/sijms/go-ora/v2 v2.7.17/go.mod h1:EHxlY6x7y9HAsdfumurRfTd+v8NrEOTR3Xl4FWlH6xk=
-github.com/songzhibin97/gkit v1.2.13 h1:paY0XJkdRuy9/8k9nTnbdrzo8pC22jIIFldUkOQv5nU=
-github.com/songzhibin97/gkit v1.2.13/go.mod h1:38CreNR27eTGaG1UMGihrXqI4xc3nGfYxLVKKVx6Ngg=
+github.com/songzhibin97/gkit v1.5.0 h1:AKSylBJOA37MasyfUxrU1UucILP+1wFESsdNH3BnHdE=
+github.com/songzhibin97/gkit v1.5.0/go.mod h1:dWcGE2Hw3C/xqWTrWlUsAD2of4y8sG7i8amYIVjecBw=
 github.com/sorairolake/lzip-go v0.3.5 h1:ms5Xri9o1JBIWvOFAorYtUNik6HI3HgBTkISiqu0Cwg=
 github.com/sorairolake/lzip-go v0.3.5/go.mod h1:N0KYq5iWrMXI0ZEXKXaS9hCyOjZUQdBDEIbXfoUwbdk=
 github.com/sourcegraph/conc v0.3.0 h1:OQTbbt6P72L20UqAkXXuLOj79LfEanQ+YQFNpLA9ySo=
