@@ -16,12 +16,14 @@ func initRedisClient(redisCfg config.Redis) (redis.UniversalClient, error) {
 	if redisCfg.UseCluster {
 		client = redis.NewClusterClient(&redis.ClusterOptions{
 			Addrs:    redisCfg.ClusterAddrs,
+			Username: redisCfg.Username,
 			Password: redisCfg.Password,
 		})
 	} else {
 		// 使用单例模式
 		client = redis.NewClient(&redis.Options{
 			Addr:     redisCfg.Addr,
+			Username: redisCfg.Username,
 			Password: redisCfg.Password,
 			DB:       redisCfg.DB,
 		})
